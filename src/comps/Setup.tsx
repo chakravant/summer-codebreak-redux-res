@@ -1,31 +1,42 @@
+import { connect, ConnectedProps } from 'react-redux';
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { startGame } from '../store/logic';
 import { setRepetitions, setTries, showGame } from '../store/settings';
 import './Setup.css';
+import { RootState } from '../store/store';
 
-export default function Setup() {
-    const setup = useAppSelector(state=> state.settings)
-    const dispatch = useAppDispatch()
+const connector = connect(
+    (state: RootState) => ({
+        tries: state.settings.tries, 
+        repetitions: state.settings.repetitions
+    }),
+    {
+        setTries, setRepetitions, startGame, showGame
+    }
+)
+type Props = ConnectedProps<typeof connector>
 
+function setup_render({
+    tries, repetitions, setTries, setRepetitions, startGame, showGame
+} : Props) {
     const updateDiff:React.ChangeEventHandler<HTMLInputElement> = e => {
         const diff = e.target.valueAsNumber;
         if (diff >= 1 || diff <= 5) {
-            dispatch(setTries(11 - diff));
+            setTries(11 - diff);
         }
     };
     const updateRpt:React.ChangeEventHandler<HTMLInputElement> = e => {
         const repetitions = e.target.checked;
-        dispatch(setRepetitions(repetitions));
+        setRepetitions(repetitions);
     };
     const start = () => {
-        dispatch(startGame({repetitions: setup.repetitions, tries: setup.tries}))
-        dispatch(showGame())
+        startGame({repetitions, tries})
+        showGame()
     }
     
     return (
         <>
-        <h1>MASTERMIND</h1>
+        <h1>Code Breaker</h1>
         <h2>Game settings</h2>
         <div className='config'>
             <p>
@@ -33,14 +44,14 @@ export default function Setup() {
                     <input type="number" 
                            max="5" 
                            min="1" 
-                           value={11 - setup.tries} 
+                           value={11 - tries} 
                            onChange={updateDiff}/>
                 </label>
             </p>
             <p>
                 <label>
                     <input type="checkbox" 
-                           checked={setup.repetitions}
+                           checked={repetitions}
                            onChange={updateRpt}/> 
                     Repetitions allowed
                 </label>
@@ -52,3 +63,7 @@ export default function Setup() {
         </>
     );
 }
+
+const Setup = connector(setup_render)
+
+export default Setup

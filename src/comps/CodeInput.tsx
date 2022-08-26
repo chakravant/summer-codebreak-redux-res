@@ -1,21 +1,29 @@
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { connect, ConnectedProps } from 'react-redux';
 import { updateAnswer } from "../store/logic";
+import { RootState } from '../store/store';
 import BallLine from "./BallLine";
 import './CodeInput.css';
 
 const numbers = [0,1,2,3,4,5,6,7,8,9];
 
-export default function CodeInput({newCode} : {newCode: (code: number[]) => void}) {
-    const answer = useAppSelector(s => s.game.currentAnswer)
-    const dispatch = useAppDispatch();
+const connector = connect(
+    (state: RootState) => ({ answer: state.game.currentAnswer }),
+    { updateAnswer }
+)
+
+interface Props extends ConnectedProps<typeof connector> {
+    newCode: (code: number[]) => void
+}
+
+function code_input({answer, updateAnswer, newCode}: Props) {
 
     const addKey = (n: number) => {
         if (answer.length < 6) {
-            dispatch(updateAnswer([...answer, n]))
+            updateAnswer([...answer, n])
         }
     }
     const removeKey = () => 
-        dispatch(updateAnswer(answer.slice(0,-1)));
+        updateAnswer(answer.slice(0,-1));
     const postCode = () => {
         newCode(answer);
     }
@@ -41,3 +49,6 @@ export default function CodeInput({newCode} : {newCode: (code: number[]) => void
         </div>
     );
 }
+
+const CodeInput = connector(code_input)
+export default CodeInput

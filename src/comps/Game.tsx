@@ -2,20 +2,25 @@ import './Game.css';
 import CodeInput from "./CodeInput";
 import Results from "./Results";
 import CipherRes from "./CipherRes";
-import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { gameReset, makeMove } from '../store/logic';
 import { showSetup } from '../store/settings';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../store/store';
 
-export default function Game() {
-    const game = useAppSelector(s => s.game)
-    const dispatch = useAppDispatch()
+const connector = connect(
+    ({ game }: RootState) => ({ game }),
+    { makeMove, showSetup, gameReset }
+)
+type Props = ConnectedProps<typeof connector>
+
+function game_screen({game, makeMove, showSetup, gameReset }: Props) {
 
     const postCode = (_code: number[]) => {
-        dispatch(makeMove())
+        makeMove()
     };
     const resetGame = () => {
-        dispatch(showSetup())
-        dispatch(gameReset())
+        showSetup()
+        gameReset()
     };
     return (
     <>
@@ -43,3 +48,5 @@ export default function Game() {
     </>
     );
 }
+
+export default connector(game_screen)

@@ -1,4 +1,4 @@
-import React, { ReactEventHandler } from "react";
+import { ReactEventHandler } from "react";
 
 import './Ball.css';
 
