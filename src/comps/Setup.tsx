@@ -1,26 +1,26 @@
-import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
-import { gameStarter } from '../store/logic';
-import { settings, screen } from '../store/store';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { startGame } from '../store/logic';
+import { setRepetitions, setTries, showGame } from '../store/settings';
 import './Setup.css';
 
 export default function Setup() {
-    const [setVal, updateSets] = useAtom(settings);
-    const updateScreen = useSetAtom(screen);
-    const startGame = useSetAtom(gameStarter);
+    const setup = useAppSelector(state=> state.settings)
+    const dispatch = useAppDispatch()
+
     const updateDiff:React.ChangeEventHandler<HTMLInputElement> = e => {
         const diff = e.target.valueAsNumber;
         if (diff >= 1 || diff <= 5) {
-            updateSets({...setVal, tries: 11 - diff});
+            dispatch(setTries(11 - diff));
         }
     };
     const updateRpt:React.ChangeEventHandler<HTMLInputElement> = e => {
         const repetitions = e.target.checked;
-        updateSets({...setVal, repetitions});
+        dispatch(setRepetitions(repetitions));
     };
     const start = () => {
-        startGame(setVal);
-        updateScreen('GAME');
+        dispatch(startGame({repetitions: setup.repetitions, tries: setup.tries}))
+        dispatch(showGame())
     }
     
     return (
@@ -33,14 +33,14 @@ export default function Setup() {
                     <input type="number" 
                            max="5" 
                            min="1" 
-                           value={11 - setVal.tries} 
+                           value={11 - setup.tries} 
                            onChange={updateDiff}/>
                 </label>
             </p>
             <p>
                 <label>
                     <input type="checkbox" 
-                           checked={setVal.repetitions}
+                           checked={setup.repetitions}
                            onChange={updateRpt}/> 
                     Repetitions allowed
                 </label>

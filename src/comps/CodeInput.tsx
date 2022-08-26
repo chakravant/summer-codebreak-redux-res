@@ -1,42 +1,42 @@
-import { atom, useAtom } from "jotai";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { updateAnswer } from "../store/logic";
 import BallLine from "./BallLine";
 import './CodeInput.css';
 
-const code = atom(new Array<number>());
 const numbers = [0,1,2,3,4,5,6,7,8,9];
 
 export default function CodeInput({newCode} : {newCode: (code: number[]) => void}) {
-    const [localCode, updateCode] = useAtom(code);
+    const answer = useAppSelector(s => s.game.currentAnswer)
+    const dispatch = useAppDispatch();
 
     const addKey = (n: number) => {
-        if (localCode.length < 6) {
-            updateCode([...localCode, n]);
+        if (answer.length < 6) {
+            dispatch(updateAnswer([...answer, n]))
         }
     }
     const removeKey = () => 
-        updateCode(localCode.slice(0,-1));
+        dispatch(updateAnswer(answer.slice(0,-1)));
     const postCode = () => {
-        updateCode([]);
-        newCode(localCode);
+        newCode(answer);
     }
 
     return (
         <div className="container">
-            <div className={"sc " + (localCode.length >= 6 ? " disabled" : "")}>
+            <div className={"sc " + (answer.length >= 6 ? " disabled" : "")}>
                 <BallLine
                         items={numbers}
                         color={ (_ix, el) => ({bgColor: `rgb(50,100,${ 50 + parseInt(el+'') *20 })`, txColor: 'white'})}
-                        disabled={localCode.length >= 6}
+                        disabled={answer.length >= 6}
                         onClick={addKey}
                 />
             </div>
             <div className="sc">
                 <BallLine
-                        items={localCode}
+                        items={answer}
                         color={ (_ix, el) => ({bgColor: `rgb(${ 50 + parseInt(el+'') *40 },100,50)`, txColor: 'white'})}
                 />
-            <button onClick={removeKey} disabled={localCode.length === 0} className="ltbutton">&lt;</button>
-            <button onClick={postCode} disabled={localCode.length !==6} className="gobutton">Go!</button>
+            <button onClick={removeKey} disabled={answer.length === 0} className="ltbutton">&lt;</button>
+            <button onClick={postCode} disabled={answer.length !==6} className="gobutton">Go!</button>
            </div>
         </div>
     );

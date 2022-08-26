@@ -1,5 +1,5 @@
 import { EAnswer } from "../engine/master";
-import { ITrial } from "../store/store";
+import { ITrial } from "../store/logic";
 import BallLine from "./BallLine";
 import CipherRes from './CipherRes';
 
